@@ -8,16 +8,47 @@
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>任务助手</h1>
-        </header>
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>任务助手</h1>
+                <button id="settings-btn" class="settings-btn">⚙️</button>
+            </div>
+            
+            <div class="sidebar-date">
+                <div id="current-date" class="date-display"></div>
+                <div id="current-time" class="time-display"></div>
+            </div>
 
-        <nav class="tabs">
-            <button class="tab active" data-tab="task-breakdown">任务拆分</button>
-            <button class="tab" data-tab="task-list">任务清单</button>
-        </nav>
+            <nav class="sidebar-nav">
+                <button class="sidebar-nav-btn active" data-view="today">
+                    <span class="nav-icon">📋</span>
+                    <span class="nav-text">今日任务</span>
+                </button>
+                <button class="sidebar-nav-btn" data-view="history-tasks">
+                    <span class="nav-icon">📚</span>
+                    <span class="nav-text">历史任务</span>
+                </button>
+                <button class="sidebar-nav-btn" data-view="history-moods">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text">历史情绪</span>
+                </button>
+            </nav>
 
-        <main>
+            <div class="sidebar-footer">
+                <button id="manage-data-btn" class="manage-data-btn">
+                    <span class="nav-icon">🗑️</span>
+                    <span class="nav-text">数据管理</span>
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <nav class="tabs">
+                <button class="tab active" data-tab="task-breakdown">任务拆分</button>
+                <button class="tab" data-tab="task-list">任务清单</button>
+                <button class="tab" data-tab="mood-record">情绪记录</button>
+            </nav>
+
             <section id="task-breakdown" class="tab-content active">
                 <div class="input-section">
                     <textarea id="task-input" placeholder="输入你想完成的任务，例如：准备明天的面试"></textarea>
@@ -29,17 +60,86 @@
             <section id="task-list" class="tab-content">
                 <div class="input-section">
                     <input type="text" id="todo-input" placeholder="输入今天的任务">
+                    <div class="task-options">
+                        <div class="option-group">
+                            <label>开始时间：</label>
+                            <input type="time" id="todo-start-time">
+                        </div>
+                        <div class="option-group">
+                            <label>结束时间：</label>
+                            <input type="time" id="todo-end-time">
+                        </div>
+                        <div class="option-group">
+                            <label>重要程度：</label>
+                            <div class="star-rating" id="star-rating">
+                                <span class="star" data-rating="1">★</span>
+                                <span class="star" data-rating="2">★</span>
+                                <span class="star" data-rating="3">★</span>
+                                <span class="star" data-rating="4">★</span>
+                                <span class="star" data-rating="5">★</span>
+                            </div>
+                        </div>
+                    </div>
                     <button id="add-todo-btn">添加任务</button>
                 </div>
                 <div id="todo-list" class="todo-list"></div>
+            </section>
+
+            <section id="mood-record" class="tab-content">
+                <div class="mood-record-container">
+                    <div class="paper">
+                        <div class="paper-header">
+                            <h2>今日心情记录</h2>
+                            <div class="paper-date" id="mood-date"></div>
+                        </div>
+                        <div class="paper-content">
+                            <div class="mood-section">
+                                <h3>📝 情绪记录</h3>
+                                <textarea id="mood-input" placeholder="今天感觉如何？发生了什么让你有这样的感觉？（例如：今天工作很顺利，心情很好 / 今天遇到了一些困难，感到有些沮丧...）"></textarea>
+                                <button id="save-mood-btn">保存情绪记录</button>
+                            </div>
+                            <div class="diary-section">
+                                <h3>📖 随笔</h3>
+                                <textarea id="diary-input" placeholder="写下今天的想法、感悟或任何你想记录的事情...（可选）"></textarea>
+                                <button id="save-diary-btn">保存随笔</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="mood-history" class="mood-history"></div>
+                </div>
             </section>
         </main>
 
         <div id="api-key-modal" class="modal">
             <div class="modal-content">
                 <h2>设置API密钥</h2>
-                <p>请输入硅基流动（SiliconFlow）API密钥以使用任务拆分功能</p>
-                <input type="password" id="api-key-input" placeholder="sk-xxxxxxxxxxxxxxxx">
+                <p>请配置API提供商和密钥以使用AI功能</p>
+                
+                <div class="api-config-group">
+                    <label for="api-provider">API提供商：</label>
+                    <select id="api-provider">
+                        <option value="siliconflow">硅基流动</option>
+                        <option value="deepseek">DeepSeek官方</option>
+                        <option value="openai">OpenAI</option>
+                        <option value="custom">自定义</option>
+                    </select>
+                </div>
+
+                <div class="api-config-group">
+                    <label for="api-endpoint">API端点：</label>
+                    <input type="text" id="api-endpoint" placeholder="https://api.example.com/v1/chat/completions">
+                </div>
+
+                <div class="api-config-group">
+                    <label for="api-model">模型名称：</label>
+                    <input type="text" id="api-model" placeholder="例如：gpt-3.5-turbo">
+                </div>
+
+                <div class="api-config-group">
+                    <label for="api-key-input">API密钥：</label>
+                    <input type="password" id="api-key-input" placeholder="sk-xxxxxxxxxxxxxxxx">
+                </div>
+
                 <div class="modal-buttons">
                     <button id="save-api-key">保存</button>
                     <button id="close-api-modal">稍后设置</button>
@@ -54,6 +154,88 @@
                 <p id="encouragement-text" class="encouragement-text"></p>
                 <div class="modal-buttons">
                     <button id="close-encouragement-modal">继续加油！</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="chat-modal" class="modal">
+            <div class="modal-content chat-modal-content">
+                <h2>需要聊聊吗？</h2>
+                <p>我注意到你今天的心情似乎不太好。如果你想找人聊聊，我可以陪你一起梳理心情。</p>
+                <div class="modal-buttons">
+                    <button id="need-chat-btn">需要</button>
+                    <button id="no-need-chat-btn">不需要</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="psychologist-modal" class="modal">
+            <div class="modal-content psychologist-modal-content">
+                <div class="psychologist-header">
+                    <h2>💬 心理咨询</h2>
+                    <button id="close-psychologist" class="close-btn">×</button>
+                </div>
+                <div id="chat-messages" class="chat-messages"></div>
+                <div class="chat-input-section">
+                    <textarea id="chat-input" placeholder="写下你的想法..."></textarea>
+                    <button id="send-chat-btn">发送</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="history-tasks-modal" class="modal">
+            <div class="modal-content history-modal-content">
+                <div class="history-header">
+                    <h2>📚 历史任务</h2>
+                    <button id="close-history-tasks" class="close-btn">×</button>
+                </div>
+                <div class="history-body">
+                    <div id="history-tasks-dates" class="history-dates"></div>
+                    <div id="history-tasks-content" class="history-content"></div>
+                </div>
+                <div class="history-actions">
+                    <button id="select-all-tasks" class="action-btn">全选</button>
+                    <button id="delete-selected-tasks" class="delete-btn">删除选中</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="history-moods-modal" class="modal">
+            <div class="modal-content history-modal-content">
+                <div class="history-header">
+                    <h2>📝 历史情绪</h2>
+                    <button id="close-history-moods" class="close-btn">×</button>
+                </div>
+                <div class="history-body">
+                    <div id="history-moods-dates" class="history-dates"></div>
+                    <div id="history-moods-content" class="history-content"></div>
+                </div>
+                <div class="history-actions">
+                    <button id="select-all-moods" class="action-btn">全选</button>
+                    <button id="delete-selected-moods" class="delete-btn">删除选中</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="manage-data-modal" class="modal">
+            <div class="modal-content manage-data-content">
+                <div class="history-header">
+                    <h2>🗑️ 数据管理</h2>
+                    <button id="close-manage-data" class="close-btn">×</button>
+                </div>
+                <div class="manage-tabs">
+                    <button class="manage-tab active" data-manage-tab="tasks">任务管理</button>
+                    <button class="manage-tab" data-manage-tab="moods">情绪管理</button>
+                    <button class="manage-tab" data-manage-tab="chats">对话管理</button>
+                </div>
+                <div class="manage-body">
+                    <div id="manage-tasks-content" class="manage-content"></div>
+                    <div id="manage-moods-content" class="manage-content"></div>
+                    <div id="manage-chats-content" class="manage-content"></div>
+                </div>
+                <div class="manage-actions">
+                    <button id="manage-select-all" class="action-btn">全选</button>
+                    <button id="manage-delete-selected" class="delete-btn">删除选中</button>
                 </div>
             </div>
         </div>
