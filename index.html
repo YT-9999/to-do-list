@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>任务助手</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>任务助手</h1>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab active" data-tab="task-breakdown">任务拆分</button>
+            <button class="tab" data-tab="task-list">任务清单</button>
+        </nav>
+
+        <main>
+            <section id="task-breakdown" class="tab-content active">
+                <div class="input-section">
+                    <textarea id="task-input" placeholder="输入你想完成的任务，例如：准备明天的面试"></textarea>
+                    <button id="breakdown-btn">拆分任务</button>
+                </div>
+                <div id="breakdown-result" class="result-section"></div>
+            </section>
+
+            <section id="task-list" class="tab-content">
+                <div class="input-section">
+                    <input type="text" id="todo-input" placeholder="输入今天的任务">
+                    <button id="add-todo-btn">添加任务</button>
+                </div>
+                <div id="todo-list" class="todo-list"></div>
+            </section>
+        </main>
+
+        <div id="api-key-modal" class="modal">
+            <div class="modal-content">
+                <h2>设置API密钥</h2>
+                <p>请输入硅基流动（SiliconFlow）API密钥以使用任务拆分功能</p>
+                <input type="password" id="api-key-input" placeholder="sk-xxxxxxxxxxxxxxxx">
+                <div class="modal-buttons">
+                    <button id="save-api-key">保存</button>
+                    <button id="close-api-modal">稍后设置</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="encouragement-modal" class="modal">
+            <div class="modal-content encouragement-modal-content">
+                <div class="encouragement-icon">🎉</div>
+                <h2>太棒了！</h2>
+                <p id="encouragement-text" class="encouragement-text"></p>
+                <div class="modal-buttons">
+                    <button id="close-encouragement-modal">继续加油！</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
