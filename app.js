@@ -129,7 +129,7 @@ async function breakdownTask(task) {
             'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-            model: 'deepseek-ai/DeepSeek-V3',
+            model: 'Pro/deepseek-ai/DeepSeek-V3.2',
             messages: [
                 {
                     role: 'system',
