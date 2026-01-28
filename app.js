@@ -162,6 +162,7 @@ function initTaskBreakdown() {
     const btn = document.getElementById('breakdown-btn');
     const input = document.getElementById('task-input');
     const result = document.getElementById('breakdown-result');
+    let isLoading = false;
 
     btn.addEventListener('click', async () => {
         const task = input.value.trim();
@@ -174,6 +175,14 @@ function initTaskBreakdown() {
             document.getElementById('api-key-modal').classList.add('show');
             return;
         }
+
+        if (isLoading) return; // 防止重复点击
+        isLoading = true;
+        
+        // 保存原始按钮文本
+        const originalText = btn.textContent;
+        btn.textContent = '拆分中...';
+        btn.disabled = true;
 
         showLoading(result);
 
@@ -188,37 +197,33 @@ function initTaskBreakdown() {
             renderBreakdownTasks();
         } catch (error) {
             showError(result, '任务拆分失败：' + error.message);
+        } finally {
+            // 恢复按钮状态
+            isLoading = false;
+            btn.textContent = originalText;
+            btn.disabled = false;
         }
     });
 }
 
 async function breakdownTask(task) {
-    const prompt = `请将以下任务拆分成多个极其简单、容易执行的最小步骤。每个步骤都要细到用户几乎不需要思考就能立即行动的程度。
+    // 检查缓存
+    const cacheKey = generateCacheKey('breakdown', task);
+    const cachedResult = getCache(cacheKey);
+    if (cachedResult) {
+        console.log('使用缓存的任务拆分结果');
+        return cachedResult;
+    }
 
-任务：${task}
+    // 优化后的prompt，保持效果的同时提高执行效率
+    const prompt = `# 任务拆分要求\n\n任务：${task}\n\n## 核心要求\n1. 拆分成5-15个极其简单的最小物理动作步骤\n2. 步骤要细到"掀开被子"、"坐起来"这种具体程度\n3. 从最简单的动作开始，保持逻辑顺序\n4. 每个步骤不超过15字，具体明确\n\n## 输出格式\n请只返回JSON数组，每个步骤包含：\n- step: 序号（从1开始）\n- content: 步骤内容\n\n示例输出：\n[{"step": 1, "content": "走到书桌前"}, {"step": 2, "content": "坐下"}]`;
 
-拆分要求：
-1. 每个步骤必须是物理上可以立即执行的最小动作
-2. 步骤要细到"掀开被子"、"坐起来"、"伸个懒腰"、"拿起手机"、"打开APP"这种程度
-3. 避免抽象的描述，必须是具体的物理动作
-4. 每个步骤都要极其简单，不需要任何心理准备就能完成
-5. 步骤之间要有逻辑顺序，从最简单的开始
-6. 步骤数量建议在5-15个之间
-
-请以JSON数组格式返回，每个步骤是一个对象，包含：
-- step: 步骤序号（从1开始）
-- content: 步骤内容（简短明确，不超过15字，必须是具体的物理动作）
-
-只返回JSON数组，不要其他内容。`;
-
-    const response = await callAI(prompt, '你是一个专业的任务拆分助手，擅长将复杂任务拆分成简单易执行的步骤。');
+    const response = await callAI(prompt, '你是专业的任务拆分助手，擅长将复杂任务拆分成简单易执行的具体物理动作步骤。');
 
     if (!response.ok) {
-        const error = await response.json();
-        console.error('API错误详情:', error);
-        console.error('状态码:', response.status);
-        console.error('完整错误对象:', JSON.stringify(error, null, 2));
-        throw new Error(error.error?.message || 'API请求失败');
+        const error = await response.json().catch(() => ({}));
+        const errorMessage = error.error?.message || `API请求失败`;
+        throw new Error(errorMessage);
     }
 
     const data = await response.json();
@@ -226,39 +231,80 @@ async function breakdownTask(task) {
     
     try {
         const steps = JSON.parse(content);
+        // 缓存结果
+        setCache(cacheKey, steps);
         return steps;
     } catch (e) {
         throw new Error('无法解析返回的步骤');
     }
 }
 
-async function callAI(prompt, systemMessage) {
+async function callAI(prompt, systemMessage, retries = 0) {
     if (!apiConfig.apiKey) {
         throw new Error('请先配置API密钥');
     }
 
-    return await fetch(apiConfig.endpoint, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiConfig.apiKey}`
-        },
-        body: JSON.stringify({
-            model: apiConfig.model,
-            messages: [
-                {
-                    role: 'system',
-                    content: systemMessage
-                },
-                {
-                    role: 'user',
-                    content: prompt
-                }
-            ],
-            temperature: 0.7,
-            max_tokens: 2000
-        })
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 90000); // 90秒超时，根据用户要求提高超时时间
+
+    try {
+        const response = await fetch(apiConfig.endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiConfig.apiKey}`
+            },
+            body: JSON.stringify({
+                model: apiConfig.model,
+                messages: [
+                    {
+                        role: 'system',
+                        content: systemMessage
+                    },
+                    {
+                        role: 'user',
+                        content: prompt
+                    }
+                ],
+                temperature: 0.7,
+                max_tokens: 1000 // 减少token数提高响应速度
+            }),
+            signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({}));
+            const errorMessage = error.error?.message || `API请求失败 (${response.status})`;
+            
+            // 重试机制
+            if (retries < 2) {
+                console.log(`请求失败，正在重试 (${retries + 1}/3)...`);
+                await new Promise(resolve => setTimeout(resolve, 1000)); // 1秒后重试
+                return callAI(prompt, systemMessage, retries + 1);
+            }
+            
+            throw new Error(errorMessage);
+        }
+
+        return response;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        
+        if (error.name === 'AbortError') {
+            throw new Error('请求超时，请稍后重试');
+        }
+        
+        // 网络错误重试
+        if (retries < 2 && (error.message.includes('网络') || error.message.includes('Network'))) {
+            console.log(`网络错误，正在重试 (${retries + 1}/3)...`);
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            return callAI(prompt, systemMessage, retries + 1);
+        }
+        
+        throw error;
+    }
 }
 
 function renderBreakdownTasks() {
@@ -522,6 +568,7 @@ function initMoodRecord() {
     const saveMoodBtn = document.getElementById('save-mood-btn');
     const saveDiaryBtn = document.getElementById('save-diary-btn');
     const moodDate = document.getElementById('mood-date');
+    let isMoodLoading = false;
 
     const today = new Date();
     const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
@@ -536,36 +583,54 @@ function initMoodRecord() {
             return;
         }
 
-        const isNegative = await checkMoodSentiment(moodText);
+        if (isMoodLoading) return; // 防止重复点击
+        isMoodLoading = true;
         
-        const today = new Date().toISOString().split('T')[0];
-        const existingRecord = moodRecords.find(r => r.date === today);
-        
-        if (existingRecord) {
-            existingRecord.mood = moodText;
-            existingRecord.isNegative = isNegative;
-        } else {
-            moodRecords.push({
-                date: today,
-                mood: moodText,
-                diary: '',
-                isNegative: isNegative
-            });
-        }
-        
-        saveMoodRecords();
-        renderMoodHistory();
-        moodInput.value = '';
+        // 保存原始按钮文本
+        const originalText = saveMoodBtn.textContent;
+        saveMoodBtn.textContent = '分析中...';
+        saveMoodBtn.disabled = true;
 
-        if (isNegative) {
-            currentMood = moodText;
-            document.getElementById('chat-modal').classList.add('show');
-        } else {
+        try {
+            const isNegative = await checkMoodSentiment(moodText);
+            
             const today = new Date().toISOString().split('T')[0];
-            if (chatHistory.length > 0) {
-                saveChatHistory(today, chatHistory);
-                chatHistory = [];
+            const existingRecord = moodRecords.find(r => r.date === today);
+            
+            if (existingRecord) {
+                existingRecord.mood = moodText;
+                existingRecord.isNegative = isNegative;
+            } else {
+                moodRecords.push({
+                    date: today,
+                    mood: moodText,
+                    diary: '',
+                    isNegative: isNegative
+                });
             }
+            
+            saveMoodRecords();
+            renderMoodHistory();
+            moodInput.value = '';
+
+            if (isNegative) {
+                currentMood = moodText;
+                document.getElementById('chat-modal').classList.add('show');
+            } else {
+                const today = new Date().toISOString().split('T')[0];
+                if (chatHistory.length > 0) {
+                    saveChatHistory(today, chatHistory);
+                    chatHistory = [];
+                }
+            }
+        } catch (error) {
+            console.error('情绪分析失败:', error);
+            alert('情绪分析失败，请稍后重试');
+        } finally {
+            // 恢复按钮状态
+            isMoodLoading = false;
+            saveMoodBtn.textContent = originalText;
+            saveMoodBtn.disabled = false;
         }
     });
 
@@ -608,6 +673,14 @@ async function checkMoodSentiment(moodText) {
         return false;
     }
 
+    // 检查缓存
+    const cacheKey = generateCacheKey('mood', moodText);
+    const cachedResult = getCache(cacheKey);
+    if (cachedResult !== null) {
+        console.log('使用缓存的情绪分析结果');
+        return cachedResult;
+    }
+
     try {
         const prompt = `请分析以下情绪描述，判断是否为负面、消极或平淡的情绪。判断标准要严格一些，只要稍微不算是好的情绪都算负面情绪。
 
@@ -628,7 +701,11 @@ async function checkMoodSentiment(moodText) {
 
         const data = await response.json();
         const result = data.choices[0].message.content.trim().toLowerCase();
-        return result === 'true';
+        const isNegative = result === 'true';
+        
+        // 缓存结果
+        setCache(cacheKey, isNegative);
+        return isNegative;
     } catch (error) {
         console.error('情绪判断出错:', error);
         return false;
@@ -668,13 +745,29 @@ function initChatModal() {
         const userMessage = chatInput.value.trim();
         if (!userMessage) return;
 
+        // 防止重复点击
+        if (sendChatBtn.disabled) return;
+        sendChatBtn.disabled = true;
+        const originalText = sendChatBtn.textContent;
+        sendChatBtn.textContent = '思考中...';
+
         addChatMessage('user', userMessage);
         chatHistory.push({ role: 'user', content: userMessage });
         chatInput.value = '';
 
-        const aiResponse = await getPsychologistResponse(chatHistory);
-        addChatMessage('ai', aiResponse);
-        chatHistory.push({ role: 'assistant', content: aiResponse });
+        try {
+            const aiResponse = await getPsychologistResponse(chatHistory);
+            addChatMessage('ai', aiResponse);
+            chatHistory.push({ role: 'assistant', content: aiResponse });
+        } catch (error) {
+            console.error('AI回复失败:', error);
+            addChatMessage('ai', '抱歉，我的回复遇到了问题，请稍后再试。');
+            chatHistory.push({ role: 'assistant', content: '抱歉，我的回复遇到了问题，请稍后再试。' });
+        } finally {
+            // 恢复按钮状态
+            sendChatBtn.textContent = originalText;
+            sendChatBtn.disabled = false;
+        }
     });
 
     chatInput.addEventListener('keypress', (e) => {
@@ -1309,6 +1402,50 @@ function renderManageChats() {
     });
     
     content.innerHTML = html;
+}
+
+// 缓存管理函数
+function getCache(key) {
+    const cache = JSON.parse(localStorage.getItem('ai_cache')) || {};
+    const item = cache[key];
+    
+    // 检查缓存是否过期（24小时）
+    if (item && (Date.now() - item.timestamp) < 24 * 60 * 60 * 1000) {
+        return item.data;
+    }
+    
+    // 缓存过期，删除
+    if (item) {
+        delete cache[key];
+        localStorage.setItem('ai_cache', JSON.stringify(cache));
+    }
+    
+    return null;
+}
+
+function setCache(key, data) {
+    const cache = JSON.parse(localStorage.getItem('ai_cache')) || {};
+    cache[key] = {
+        data: data,
+        timestamp: Date.now()
+    };
+    localStorage.setItem('ai_cache', JSON.stringify(cache));
+}
+
+function clearCache() {
+    localStorage.removeItem('ai_cache');
+}
+
+// 生成缓存键
+function generateCacheKey(prefix, content) {
+    // 使用内容的哈希作为缓存键的一部分
+    let hash = 0;
+    for (let i = 0; i < content.length; i++) {
+        const char = content.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+    }
+    return `${prefix}_${hash}`;
 }
 
 function saveChatHistory(date, messages) {
