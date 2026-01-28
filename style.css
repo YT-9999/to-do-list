@@ -1179,93 +1179,485 @@ button:active {
 
 @media (max-width: 600px) {
     body {
-        padding: 15px;
+        padding: 0;
+        font-size: 14px;
     }
 
     .container {
         flex-direction: column;
+        min-height: 100vh;
     }
 
     .sidebar {
         width: 100%;
         height: auto;
-        position: relative;
+        position: sticky;
+        top: 0;
+        z-index: 100;
         border-right: none;
         border-bottom: 1px solid #e0e0e0;
+        padding: 12px 15px;
+        background-color: #fff;
+    }
+
+    .sidebar-header {
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+    }
+
+    .sidebar-header h1 {
+        font-size: 18px;
+    }
+
+    .settings-btn {
+        font-size: 20px;
+        padding: 5px;
+    }
+
+    .sidebar-date {
+        padding: 12px;
+        margin-bottom: 15px;
+    }
+
+    .date-display {
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+
+    .time-display {
+        font-size: 24px;
+        letter-spacing: 1px;
+    }
+
+    .sidebar-nav {
+        gap: 5px;
+    }
+
+    .sidebar-nav-btn {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+
+    .nav-icon {
+        font-size: 16px;
+    }
+
+    .sidebar-footer {
+        margin-top: 10px;
+        padding-top: 10px;
+    }
+
+    .manage-data-btn {
+        padding: 10px 12px;
+        font-size: 13px;
     }
 
     .main-content {
-        padding: 20px;
+        padding: 15px;
+        overflow-y: auto;
     }
 
-    header h1 {
-        font-size: 24px;
+    .tabs {
+        margin-bottom: 20px;
+        flex-wrap: wrap;
     }
 
     .tab {
-        padding: 12px 15px;
-        font-size: 14px;
+        flex: 1 1 auto;
+        min-width: 80px;
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+
+    .input-section {
+        margin-bottom: 20px;
     }
 
     .task-options {
         grid-template-columns: 1fr;
-        padding: 15px;
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .option-group label {
+        font-size: 13px;
+    }
+
+    .star-rating {
+        gap: 5px;
+    }
+
+    .star {
+        font-size: 22px;
     }
 
     textarea,
     input[type="text"],
     input[type="password"],
     input[type="time"] {
-        font-size: 16px;
-        padding: 12px;
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    textarea {
+        min-height: 100px;
     }
 
     button {
         width: 100%;
-        padding: 14px;
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    .todo-item {
+        padding: 12px;
+    }
+
+    .todo-text {
+        font-size: 14px;
+    }
+
+    .task-time {
+        font-size: 11px;
+        padding: 2px 6px;
+    }
+
+    .task-stars {
+        font-size: 12px;
+    }
+
+    .todo-breakdown-btn,
+    .todo-delete {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    .step-item {
+        padding: 12px;
+    }
+
+    .step-number {
+        width: 26px;
+        height: 26px;
+        font-size: 13px;
+        margin-right: 12px;
+    }
+
+    .step-content {
+        font-size: 14px;
+    }
+
+    .step-checkbox {
+        width: 20px;
+        height: 20px;
+        margin-left: 12px;
+    }
+
+    .paper {
+        padding: 20px 15px;
+    }
+
+    .paper::before {
+        left: 20px;
+    }
+
+    .paper-header {
+        margin-bottom: 20px;
+    }
+
+    .paper-header h2 {
+        font-size: 18px;
+    }
+
+    .paper-date {
+        font-size: 12px;
+    }
+
+    .mood-section h3,
+    .diary-section h3 {
         font-size: 15px;
+        margin-bottom: 12px;
+    }
+
+    .mood-section textarea,
+    .diary-section textarea {
+        font-size: 14px;
+        line-height: 26px;
+        padding: 8px 12px;
+        min-height: 100px;
+    }
+
+    .mood-section button,
+    .diary-section button {
+        margin-top: 12px;
+        padding: 10px 20px;
+        font-size: 13px;
+    }
+
+    .mood-history-item {
+        padding: 15px;
+    }
+
+    .mood-history-date {
+        font-size: 12px;
+    }
+
+    .mood-history-mood {
+        font-size: 14px;
+    }
+
+    .mood-history-diary {
+        font-size: 13px;
     }
 
     .modal-content {
-        padding: 20px;
+        padding: 20px 15px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .modal-content h2 {
+        font-size: 18px;
+        margin-bottom: 12px;
+    }
+
+    .modal-content p {
+        font-size: 14px;
+        margin-bottom: 15px;
     }
 
     .modal-buttons {
         flex-direction: column;
+        gap: 8px;
     }
 
     .modal-buttons button {
         width: 100%;
+        padding: 12px;
+        font-size: 14px;
     }
 
-    .paper {
+    .api-config-group {
+        margin-bottom: 15px;
+    }
+
+    .api-config-group label {
+        font-size: 13px;
+        margin-bottom: 6px;
+    }
+
+    .api-config-group select,
+    .api-config-group input {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .encouragement-modal-content {
         padding: 30px 20px;
     }
 
-    .paper::before {
-        left: 30px;
+    .encouragement-icon {
+        font-size: 48px;
+        margin-bottom: 15px;
+    }
+
+    .encouragement-modal-content h2 {
+        font-size: 22px;
+        margin-bottom: 15px;
+    }
+
+    .encouragement-text {
+        font-size: 16px;
+        margin-bottom: 20px;
+    }
+
+    .chat-modal-content {
+        padding: 30px 20px;
+    }
+
+    .chat-modal-content h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+    }
+
+    .chat-modal-content p {
+        font-size: 14px;
+        margin-bottom: 20px;
     }
 
     .psychologist-modal-content {
-        max-height: 90vh;
+        max-height: 95vh;
+        width: 98%;
+    }
+
+    .psychologist-header {
+        padding: 15px 20px;
+    }
+
+    .psychologist-header h2 {
+        font-size: 18px;
+    }
+
+    .close-btn {
+        font-size: 28px;
     }
 
     .chat-messages {
-        max-height: 300px;
+        padding: 15px 20px;
+        max-height: 350px;
+    }
+
+    .chat-message {
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+
+    .chat-input-section {
+        padding: 15px 20px;
+    }
+
+    .chat-input-section textarea {
+        font-size: 14px;
+        padding: 10px;
+        min-height: 50px;
+    }
+
+    .chat-input-section button {
+        padding: 10px 20px;
+        font-size: 14px;
+        white-space: nowrap;
     }
 
     .history-modal-content {
-        flex-direction: column;
+        max-height: 95vh;
+        width: 98%;
+    }
+
+    .history-header {
+        padding: 15px 20px;
+    }
+
+    .history-header h2 {
+        font-size: 18px;
     }
 
     .history-dates {
         width: 100%;
         border-right: none;
         border-bottom: 1px solid #e0e0e0;
-        max-height: 200px;
+        max-height: 150px;
+        padding: 8px;
+    }
+
+    .history-date-item {
+        padding: 10px 12px;
+        font-size: 13px;
+        margin-bottom: 3px;
     }
 
     .history-content {
+        padding: 15px 20px;
+    }
+
+    .history-date-title {
+        font-size: 16px;
+        margin-bottom: 15px;
+        padding-bottom: 8px;
+    }
+
+    .history-actions {
+        padding: 12px 20px;
+        flex-wrap: wrap;
+    }
+
+    .action-btn,
+    .delete-btn {
+        padding: 8px 14px;
+        font-size: 12px;
+    }
+
+    .manage-data-content {
+        max-height: 95vh;
+        width: 98%;
+    }
+
+    .manage-tabs {
+        margin-bottom: 15px;
+    }
+
+    .manage-tab {
+        padding: 12px 15px;
+        font-size: 13px;
+    }
+
+    .manage-body {
+        max-height: 400px;
+    }
+
+    .manage-content {
         padding: 15px;
+        max-height: 350px;
+    }
+
+    .manage-item {
+        padding: 10px 12px;
+    }
+
+    .manage-item-checkbox {
+        width: 16px;
+        height: 16px;
+        margin-right: 12px;
+    }
+
+    .manage-item-date {
+        font-size: 13px;
+        margin-bottom: 3px;
+    }
+
+    .manage-item-count {
+        font-size: 11px;
+    }
+
+    .manage-actions {
+        padding: 12px 20px;
+        flex-wrap: wrap;
+    }
+
+    .history-empty {
+        padding: 40px 15px;
+        font-size: 14px;
+    }
+
+    .empty-state {
+        padding: 30px 15px;
+        font-size: 14px;
+    }
+
+    .loading {
+        padding: 30px;
+        font-size: 14px;
+    }
+
+    .error {
+        padding: 12px;
+        font-size: 13px;
+    }
+
+    .chat-history-item {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+
+    .chat-history-header {
+        margin-bottom: 12px;
+    }
+
+    .chat-history-date {
+        font-size: 12px;
+    }
+
+    .view-chat-btn {
+        padding: 6px 12px;
+        font-size: 12px;
     }
 }
