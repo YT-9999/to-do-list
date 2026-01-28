@@ -469,8 +469,10 @@ function renderTodos() {
                         <span class="task-stars">${stars}</span>
                     </div>
                 </div>
-                <button class="todo-breakdown-btn" data-todo-id="${todo.id}">拆分</button>
-                <button class="todo-delete">删除</button>
+                <div class="todo-actions">
+                    <button class="todo-breakdown-btn" data-todo-id="${todo.id}">拆分</button>
+                    <button class="todo-delete">删除</button>
+                </div>
             </div>
         `;
     });

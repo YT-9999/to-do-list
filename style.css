@@ -1181,6 +1181,7 @@ button:active {
     body {
         padding: 0;
         font-size: 14px;
+        overflow-x: hidden;
     }
 
     .container {
@@ -1250,6 +1251,7 @@ button:active {
     .manage-data-btn {
         padding: 10px 12px;
         font-size: 13px;
+        border-radius: 8px;
     }
 
     .main-content {
@@ -1297,6 +1299,8 @@ button:active {
     input[type="time"] {
         font-size: 14px;
         padding: 10px;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     textarea {
@@ -1307,14 +1311,29 @@ button:active {
         width: 100%;
         padding: 12px;
         font-size: 14px;
+        box-sizing: border-box;
     }
 
     .todo-item {
         padding: 12px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .todo-content {
+        width: 100%;
     }
 
     .todo-text {
         font-size: 14px;
+        width: 100%;
+    }
+
+    .todo-meta {
+        width: 100%;
+        flex-wrap: wrap;
+        gap: 8px;
     }
 
     .task-time {
@@ -1326,10 +1345,18 @@ button:active {
         font-size: 12px;
     }
 
+    .todo-actions {
+        width: 100%;
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+    }
+
     .todo-breakdown-btn,
     .todo-delete {
         padding: 6px 10px;
         font-size: 12px;
+        flex: 1;
     }
 
     .step-item {
@@ -1385,6 +1412,8 @@ button:active {
         line-height: 26px;
         padding: 8px 12px;
         min-height: 100px;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .mood-section button,
@@ -1410,10 +1439,16 @@ button:active {
         font-size: 13px;
     }
 
+    .modal {
+        padding: 10px;
+    }
+
     .modal-content {
-        padding: 20px 15px;
-        max-height: 90vh;
+        padding: 15px;
+        max-height: 95vh;
         overflow-y: auto;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .modal-content h2 {
@@ -1450,6 +1485,8 @@ button:active {
     .api-config-group input {
         padding: 10px;
         font-size: 14px;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .encouragement-modal-content {
@@ -1487,7 +1524,7 @@ button:active {
 
     .psychologist-modal-content {
         max-height: 95vh;
-        width: 98%;
+        width: 100%;
     }
 
     .psychologist-header {
@@ -1514,23 +1551,28 @@ button:active {
 
     .chat-input-section {
         padding: 15px 20px;
+        flex-direction: column;
+        gap: 8px;
     }
 
     .chat-input-section textarea {
         font-size: 14px;
         padding: 10px;
         min-height: 50px;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .chat-input-section button {
         padding: 10px 20px;
         font-size: 14px;
-        white-space: nowrap;
+        width: 100%;
     }
 
     .history-modal-content {
         max-height: 95vh;
-        width: 98%;
+        width: 100%;
+        flex-direction: column;
     }
 
     .history-header {
@@ -1541,11 +1583,17 @@ button:active {
         font-size: 18px;
     }
 
+    .history-body {
+        flex-direction: column;
+        flex: 1;
+        overflow: hidden;
+    }
+
     .history-dates {
         width: 100%;
         border-right: none;
         border-bottom: 1px solid #e0e0e0;
-        max-height: 150px;
+        max-height: 120px;
         padding: 8px;
     }
 
@@ -1553,60 +1601,83 @@ button:active {
         padding: 10px 12px;
         font-size: 13px;
         margin-bottom: 3px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .history-content {
         padding: 15px 20px;
+        flex: 1;
+        overflow-y: auto;
     }
 
     .history-date-title {
         font-size: 16px;
         margin-bottom: 15px;
         padding-bottom: 8px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .history-actions {
         padding: 12px 20px;
-        flex-wrap: wrap;
+        flex-direction: column;
+        gap: 8px;
     }
 
     .action-btn,
     .delete-btn {
-        padding: 8px 14px;
-        font-size: 12px;
+        padding: 10px 14px;
+        font-size: 13px;
+        width: 100%;
     }
 
     .manage-data-content {
         max-height: 95vh;
-        width: 98%;
+        width: 100%;
     }
 
     .manage-tabs {
         margin-bottom: 15px;
+        flex-direction: column;
+        gap: 4px;
     }
 
     .manage-tab {
         padding: 12px 15px;
         font-size: 13px;
+        border-radius: 6px;
     }
 
     .manage-body {
         max-height: 400px;
+        flex-direction: column;
     }
 
     .manage-content {
         padding: 15px;
         max-height: 350px;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .manage-item {
         padding: 10px 12px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
     }
 
     .manage-item-checkbox {
         width: 16px;
         height: 16px;
         margin-right: 12px;
+    }
+
+    .manage-item-content {
+        width: 100%;
     }
 
     .manage-item-date {
@@ -1620,7 +1691,8 @@ button:active {
 
     .manage-actions {
         padding: 12px 20px;
-        flex-wrap: wrap;
+        flex-direction: column;
+        gap: 8px;
     }
 
     .history-empty {
@@ -1650,6 +1722,9 @@ button:active {
 
     .chat-history-header {
         margin-bottom: 12px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
     }
 
     .chat-history-date {
@@ -1659,5 +1734,89 @@ button:active {
     .view-chat-btn {
         padding: 6px 12px;
         font-size: 12px;
+        width: 100%;
+    }
+
+    .todo-item.completed .todo-text {
+        text-decoration: line-through;
+        color: #666;
+    }
+
+    .step-item.completed .step-content {
+        text-decoration: line-through;
+        color: #666;
+    }
+
+    .step-item.completed .step-number {
+        background-color: #4caf50;
+    }
+
+    .todo-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .todo-checkbox {
+        align-self: flex-start;
+        margin-bottom: 4px;
+    }
+
+    .todo-content {
+        width: 100%;
+    }
+
+    .todo-meta {
+        width: 100%;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .todo-actions {
+        width: 100%;
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+    }
+
+    .todo-breakdown-btn,
+    .todo-delete {
+        flex: 1;
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 400px) {
+    .sidebar {
+        padding: 10px 12px;
+    }
+
+    .sidebar-header h1 {
+        font-size: 16px;
+    }
+
+    .sidebar-date {
+        padding: 10px;
+    }
+
+    .time-display {
+        font-size: 20px;
+    }
+
+    .main-content {
+        padding: 12px;
+    }
+
+    .modal-content {
+        padding: 12px;
+    }
+
+    .history-dates {
+        max-height: 100px;
+    }
+
+    .history-content {
+        padding: 12px 15px;
     }
 }
